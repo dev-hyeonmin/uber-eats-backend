@@ -8,6 +8,7 @@ import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { Users } from './users/entities/users.entitiy';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { Users } from './users/entities/users.entitiy';
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_DATABASE: Joi.string().required(),
+        PRIVATE_KEY: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -40,6 +42,9 @@ import { Users } from './users/entities/users.entitiy';
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
+    }),
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY,
     }),
     UsersModule,
     CommonModule,

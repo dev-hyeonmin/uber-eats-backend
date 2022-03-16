@@ -1,15 +1,20 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateAccountInput } from "./dtos/create-account.dto";
 import { LoginInput } from "./dtos/login.dto";
 import { Users } from "./entities/users.entitiy";
+import * as jwt from "jsonwebtoken";
+import { JwtService } from "src/jwt/jwt.service";
 
 @Injectable() // 주사(주입) 가능한
 export class UsersService {
     constructor(
         @InjectRepository(Users)
-        private readonly users: Repository<Users>
+        private readonly users: Repository<Users>,
+        private readonly config: ConfigService,
+        private readonly jwtService: JwtService,
     ) { }
 
     async createAccount({ email, password, role }: CreateAccountInput): Promise<{ ok: boolean, error?: string }> {
@@ -43,9 +48,11 @@ export class UsersService {
                     error: 'Wrong password',
                 };
             }
+
+            this.users.update(user.id, { "lastLogin": this.getNow() });
             return {
                 ok: true,
-                token: 'testToken123',
+                token: this.jwtService.sign(user.id),
             };
         } catch (error) {
             return {
@@ -53,5 +60,18 @@ export class UsersService {
                 error,
             };
         }
+    }
+
+    private getNow(): string {
+        let today = new Date();
+
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let date = today.getDate();
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+        let seconds = today.getSeconds();
+
+        return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}:00`;
     }
 }

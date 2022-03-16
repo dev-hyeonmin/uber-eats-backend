@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from "@nestjs/common";
 
@@ -27,6 +27,10 @@ export class Users extends CoreEntity {
     @Column()
     @Field(type => UserRole)
     role: UserRole;
+
+    @UpdateDateColumn()
+    @Field(type => Date)
+    lastLogin: string;
 
     @BeforeInsert()
     async hashPassword(): Promise<void> {
