@@ -9,7 +9,7 @@ import * as jwt from "jsonwebtoken";
 import { JwtService } from "src/jwt/jwt.service";
 
 @Injectable() // 주사(주입) 가능한
-export class UsersService {
+export class UserService {
     constructor(
         @InjectRepository(Users)
         private readonly users: Repository<Users>,
@@ -60,6 +60,10 @@ export class UsersService {
                 error,
             };
         }
+    }
+
+    async findById(id: number): Promise<Users> {
+        return this.users.findOne({ id });
     }
 
     private getNow(): string {
