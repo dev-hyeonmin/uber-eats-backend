@@ -7,6 +7,7 @@ import { LoginInput } from "./dtos/login.dto";
 import { Users } from "./entities/users.entitiy";
 import * as jwt from "jsonwebtoken";
 import { JwtService } from "src/jwt/jwt.service";
+import { EditProfileInput } from "./dtos/user-edit.dto";
 
 @Injectable() // 주사(주입) 가능한
 export class UserService {
@@ -29,6 +30,27 @@ export class UserService {
         } catch (e) {
             return { ok: false, error: "Couldn't create user" };
         }
+    }
+
+    async editProfile(userId: number, { email, password }: EditProfileInput): Promise<Users> {
+        const user = await this.users.findOne(userId);
+        if (email) {
+            user.email = email;
+        }
+        if (password) {
+            user.password = password;
+        }
+
+        return this.users.save(user);
+
+        /*
+            return this.users.update(userId, { ...editProfileInput });
+            해당 경우 update시 패스워드가 암호화 되지 않고 평서문으로 들어간다.
+            @BeforeUpdate() 가 작동하지 않는 이유는 update 함수 설명에 보면
+            우리가 entitiy를 보내고 있는것이 아니라 query를 보내고 있어 그렇다.
+            따라서 save함수를 사용해준다.
+            :: save() -> 해당 데이터가 있을 경우 update, 없다면 insert
+        */
     }
 
     async login({ email, password }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {

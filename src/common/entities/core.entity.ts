@@ -2,10 +2,10 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { number } from "joi";
 import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-
+@ObjectType()
 export class CoreEntity {
     @PrimaryGeneratedColumn()
-    @Field(type => number)
+    @Field(type => Number)
     id: number;
 
     @CreateDateColumn()
