@@ -4,17 +4,19 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateAccountInput } from "./dtos/create-account.dto";
 import { LoginInput } from "./dtos/login.dto";
-import { Users } from "./entities/users.entitiy";
+import { User } from "./entities/user.entitiy";
 import * as jwt from "jsonwebtoken";
 import { JwtService } from "src/jwt/jwt.service";
 import { EditProfileInput } from "./dtos/user-edit.dto";
+import { Verification } from "./entities/verification.entity";
 
 @Injectable() // 주사(주입) 가능한
 export class UserService {
     constructor(
-        @InjectRepository(Users)
-        private readonly users: Repository<Users>,
-        private readonly config: ConfigService,
+        @InjectRepository(User)
+        private readonly users: Repository<User>,
+        @InjectRepository(Verification)
+        private readonly verifications: Repository<Verification>,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -25,17 +27,20 @@ export class UserService {
                 return { ok: false, error: "There is a user with that email already" };
             }
 
-            await this.users.save(this.users.create({ email, password, role }));
+            const user = await this.users.save(this.users.create({ email, password, role }));
+            await this.verifications.save(this.verifications.create({ user }));
             return { ok: true };
         } catch (e) {
             return { ok: false, error: "Couldn't create user" };
         }
     }
 
-    async editProfile(userId: number, { email, password }: EditProfileInput): Promise<Users> {
+    async editProfile(userId: number, { email, password }: EditProfileInput): Promise<User> {
         const user = await this.users.findOne(userId);
         if (email) {
             user.email = email;
+            user.verified = false;
+            await this.verifications.save(this.verifications.create({ user }));
         }
         if (password) {
             user.password = password;
@@ -84,7 +89,7 @@ export class UserService {
         }
     }
 
-    async findById(id: number): Promise<Users> {
+    async findById(id: number): Promise<User> {
         return this.users.findOne({ id });
     }
 

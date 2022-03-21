@@ -6,16 +6,16 @@ import { CreateAccountInput, CreateAccountOutput } from "./dtos/create-account.d
 import { LoginInput, LoginOutput } from "./dtos/login.dto";
 import { EditProfileInput, EditProfileOutput } from "./dtos/user-edit.dto";
 import { UserProfileInput, UserProfileOutput } from "./dtos/user-profile.dto";
-import { Users } from "./entities/users.entitiy";
+import { User } from "./entities/user.entitiy";
 import { UserService } from "./users.service";
 
 @Resolver()
 export class UsersResolver {
     constructor(private readonly userService: UserService) { }
 
-    @Query(returns => Users)
+    @Query(returns => User)
     @UseGuards(AuthGuard)
-    me(@AuthUser() authUser: Users) {
+    me(@AuthUser() authUser: User) {
         return authUser;
     }
 
@@ -64,7 +64,7 @@ export class UsersResolver {
     @Query(returns => EditProfileOutput)
     @UseGuards(AuthGuard)
     async editProfile(
-        @AuthUser() authUser: Users,
+        @AuthUser() authUser: User,
         @Args('input') editProfileInput: EditProfileInput
     ): Promise<EditProfileOutput> {
         try {

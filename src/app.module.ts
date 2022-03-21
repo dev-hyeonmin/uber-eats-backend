@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
-import { Users } from './users/entities/users.entitiy';
+import { User } from './users/entities/user.entitiy';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { AuthModule } from './auth/auth.module';
+import { Verification } from './users/entities/verification.entity';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== "prod",
       logging: process.env.NODE_ENV !== "prod",
-      entities: [Users]
+      entities: [User, Verification]
     }),
     GraphQLModule.forRoot({
       driver: ApolloDriver,

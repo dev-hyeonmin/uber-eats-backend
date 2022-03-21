@@ -15,7 +15,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 @InputType({ isAbstract: true })
 @ObjectType()
 @Entity()
-export class Users extends CoreEntity {
+export class User extends CoreEntity {
     @Column()
     @Field(type => String)
     email: string;
@@ -27,6 +27,10 @@ export class Users extends CoreEntity {
     @Column()
     @Field(type => UserRole)
     role: UserRole;
+
+    @Column({ default: false })
+    @Field(type => Boolean)
+    verified: boolean;
 
     @UpdateDateColumn()
     @Field(type => Date)
