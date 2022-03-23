@@ -5,12 +5,12 @@ import { Repository } from "typeorm";
 import { CreateAccountInput, CreateAccountOutput } from "./dtos/create-account.dto";
 import { LoginInput, LoginOutput } from "./dtos/login.dto";
 import { User } from "./entities/user.entitiy";
-import * as jwt from "jsonwebtoken";
 import { JwtService } from "src/jwt/jwt.service";
 import { EditProfileInput, EditProfileOutput } from "./dtos/user-edit.dto";
 import { Verification } from "./entities/verification.entity";
 import { UserProfileOutput } from "./dtos/user-profile.dto";
 import { VerifyEmailOutput } from "./dtos/verify-email.dto";
+import { MailService } from "src/mail/mail.service";
 
 @Injectable() // 주사(주입) 가능한
 export class UserService {
@@ -19,6 +19,7 @@ export class UserService {
         private readonly users: Repository<User>,
         @InjectRepository(Verification)
         private readonly verifications: Repository<Verification>,
+        private readonly mailService: MailService,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -48,7 +49,8 @@ export class UserService {
             }
 
             const user = await this.users.save(this.users.create({ email, password, role }));
-            await this.verifications.save(this.verifications.create({ user }));
+            const verification = await this.verifications.save(this.verifications.create({ user }));
+            await this.mailService.sendVerificationEmail(user.email, verification.code);
             return { ok: true };
         } catch (e) {
             return { ok: false, error: "Couldn't create user" };
@@ -61,7 +63,9 @@ export class UserService {
             if (email) {
                 user.email = email;
                 user.verified = false;
-                await this.verifications.save(this.verifications.create({ user }));
+                const verification = await this.verifications.save(this.verifications.create({ user }));
+                console.log(verification);
+                await this.mailService.sendVerificationEmail(user.email, verification.code);
             }
             if (password) {
                 user.password = password;
@@ -125,7 +129,8 @@ export class UserService {
             const verification = await this.verifications.findOne({ code }, { relations: ['user'] });
             if (verification) {
                 verification.user.verified = true;
-                this.users.save(verification.user);
+                await this.users.save(verification.user);
+                await this.verifications.delete(verification.id);
                 return { ok: true };
             }
             throw new Error();
