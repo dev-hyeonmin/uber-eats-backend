@@ -50,7 +50,8 @@ export class UserService {
 
             const user = await this.users.save(this.users.create({ email, password, role }));
             const verification = await this.verifications.save(this.verifications.create({ user }));
-            await this.mailService.sendVerificationEmail(user.email, verification.code);
+            //this.mailService.sendVerificationEmail(user.email, verification.code);
+            this.mailService.sendMailer(user.email);
             return { ok: true };
         } catch (e) {
             return { ok: false, error: "Couldn't create user" };
@@ -64,8 +65,8 @@ export class UserService {
                 user.email = email;
                 user.verified = false;
                 const verification = await this.verifications.save(this.verifications.create({ user }));
-                console.log(verification);
-                await this.mailService.sendVerificationEmail(user.email, verification.code);
+                //this.mailService.sendVerificationEmail(user.email, verification.code);
+                this.mailService.sendMailer(user.email);
             }
             if (password) {
                 user.password = password;

@@ -3,26 +3,23 @@ import * as FormData from 'form-data';
 import { Inject, Injectable } from '@nestjs/common';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { EmailVar, MailModuleOptions } from './mail.interface';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class MailService {
     constructor(
-        @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions
-    ) {
-        //console.log(this.option);
-        /*this.sendMail("잠온다.", "강의만 들으면 잠이옴 웃김.").then(() => {
-            console.log("Message sent");
-        }).catch((error) => {
-            console.log(error.response.body);
-        });*/
-    }
+        @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
+        private readonly mailerService: MailerService,
+    ) { }
 
+    // 1. mailgun
     private async sendMail(subject: string, template: string, emailVars: EmailVar[]) {
         var form = new FormData();
         form.append("from", `Excited User <mailgun@${this.options.domain}>`);
         form.append("to", `hyeonminroh@gmail.com`);
         form.append("subject", subject);
         form.append("template", template);
+
         emailVars.forEach(eVar => form.append(`v:${eVar.key}`, eVar.value));
         try {
             const response = await got(
@@ -43,11 +40,24 @@ export class MailService {
     }
 
     sendVerificationEmail(email: string, code: string) {
-        this.sendMail('Verify Your Email', 'confirm',
+        this.sendMail('Verify Your Email', 'verify-email',
             [
-                { "key": "username", "value": email },
-                { "key": "code", "value": code }
+                { key: 'code', value: code },
+                { key: 'username', value: email },
             ]
         );
+    }
+
+    // 2. nestJs 
+    sendMailer(receiver: string): void {
+        this.mailerService
+            .sendMail({
+                to: 'hyeonminroh@gmail.com', // list of receivers
+                from: this.options.fromEmail, // sender address
+                subject: 'Verify Your Email', // Subject line
+                html: `Please Confrim Your Email.<br>Hello ${receiver} :)<br>Please confirm your account!<br>Thanks for choosing Nuber eats<br><a href="http://127.0.0.1:3000/confirm?code={{code}}">Click Here to Confirm</a>`, // HTML body content
+            })
+            .then(() => { console.log("sended"); })
+            .catch((e) => { console.log(e); });
     }
 }
