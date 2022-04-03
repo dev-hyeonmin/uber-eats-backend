@@ -49,7 +49,7 @@ export class MailService {
     }
 
     // 2. nestJs 
-    sendMailer(receiver: string): void {
+    sendMailer(receiver: string) {
         this.mailerService
             .sendMail({
                 to: 'hyeonminroh@gmail.com', // list of receivers
