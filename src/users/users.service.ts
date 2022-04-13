@@ -30,7 +30,6 @@ export class UserService {
                 user
             }
         } catch (error) {
-            console.log(error);
             return {
                 ok: false,
                 error: "User Not Found"
@@ -48,7 +47,7 @@ export class UserService {
             const user = await this.users.save(this.users.create({ email, password, role }));
             const verification = await this.verifications.save(this.verifications.create({ user }));
             //this.mailService.sendVerificationEmail(user.email, verification.code);
-            this.mailService.sendMailer(user.email);
+            //this.mailService.sendEmail(user.email);
             return { ok: true };
         } catch (e) {
             return { ok: false, error: "Couldn't create user" };
@@ -63,7 +62,7 @@ export class UserService {
                 user.verified = false;
                 const verification = await this.verifications.save(this.verifications.create({ user }));
                 //this.mailService.sendVerificationEmail(user.email, verification.code);
-                this.mailService.sendMailer(user.email);
+                //this.mailService.sendMailer(user.email);
             }
             if (password) {
                 user.password = password;
@@ -115,10 +114,7 @@ export class UserService {
                 token: this.jwtService.sign(user.id),
             };
         } catch (error) {
-            return {
-                ok: false,
-                error,
-            };
+            return { ok: false, error: "Can't log user in." };
         }
     }
 
@@ -136,7 +132,6 @@ export class UserService {
                 error: 'Verification not found.'
             };
         } catch (error) {
-            console.log(error);
             return {
                 ok: false,
                 error: 'Could not verify email.'
