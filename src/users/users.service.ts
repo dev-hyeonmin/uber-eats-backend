@@ -46,7 +46,7 @@ export class UserService {
 
             const user = await this.users.save(this.users.create({ email, password, role }));
             const verification = await this.verifications.save(this.verifications.create({ user }));
-            //this.mailService.sendVerificationEmail(user.email, verification.code);
+            this.mailService.sendVerificationEmail(user.email, verification.code);
             //this.mailService.sendEmail(user.email);
             return { ok: true };
         } catch (e) {
@@ -60,6 +60,8 @@ export class UserService {
             if (email) {
                 user.email = email;
                 user.verified = false;
+
+                this.verifications.delete({ user: { id: user.id } });
                 const verification = await this.verifications.save(this.verifications.create({ user }));
                 //this.mailService.sendVerificationEmail(user.email, verification.code);
                 //this.mailService.sendMailer(user.email);

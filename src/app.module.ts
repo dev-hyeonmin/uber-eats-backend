@@ -10,7 +10,6 @@ import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entitiy';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
-import { AuthModule } from './auth/auth.module';
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -23,7 +22,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       ignoreEnvFile: process.env.NODE_ENV === "prod",
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
-          .valid('dev', 'prod')
+          .valid('dev', 'prod', 'test')
           .required(),
         DB_HOST: Joi.string().required(),
         DB_PORT: Joi.string().required(),
@@ -34,7 +33,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN_NAME: Joi.string().required(),
         MAILGUN_FROM_EMAIL: Joi.string().required(),
-        MAILGUN_FROM_PASSWORD: Joi.string().required(),
+        //MAILGUN_FROM_PASSWORD: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -45,7 +44,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== "prod",
-      logging: process.env.NODE_ENV !== "prod",
+      logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [User, Verification]
     }),
     GraphQLModule.forRoot({

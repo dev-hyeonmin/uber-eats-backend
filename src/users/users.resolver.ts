@@ -31,7 +31,7 @@ export class UsersResolver {
         return this.userService.createAccount(createAccountInput);
     }
 
-    @Query(returns => EditProfileOutput)
+    @Mutation(returns => EditProfileOutput)
     @UseGuards(AuthGuard)
     async editProfile(
         @AuthUser() authUser: User,
