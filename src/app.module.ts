@@ -16,6 +16,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Restaurant } from './restaurants/entities/restaurants.entity';
 import { Category } from './restaurants/entities/category.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
     }),
     UsersModule,
     RestaurantsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

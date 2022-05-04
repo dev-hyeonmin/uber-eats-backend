@@ -19,7 +19,7 @@ export class RestaurantService {
         owner: User,
         createRestaurantInput: CreateRestaurantInput
     ): Promise<CreateRestaurantOutput> {
-        //xconsole.log(createRestaurantInput);
+        //console.log(createRestaurantInput);
         try {
             const newRestaurant = this.restaurants.create(createRestaurantInput);
             newRestaurant.owner = owner;
