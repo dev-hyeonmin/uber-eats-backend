@@ -2,7 +2,10 @@ import { Injectable, Res } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/users/entities/user.entitiy";
 import { Repository } from "typeorm";
+import { AllCategoriesOutput } from "./dtos/all-cateogories.dto";
+import { CategoryInput, CategoryOutput } from "./dtos/category.dto";
 import { CreateRestaurantInput, CreateRestaurantOutput } from "./dtos/create-restaurant.dto";
+import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
 import { EditRestaurantInput, EditRestaurantOuput } from "./dtos/edit-restaurant.dto";
 import { Category } from "./entities/category.entity";
 import { Restaurant } from "./entities/restaurants.entity";
@@ -47,19 +50,9 @@ export class RestaurantService {
         editRestaurantInput: EditRestaurantInput
     ): Promise<EditRestaurantOuput> {
         try {
-            const restaurant = await this.restaurants.findOne(editRestaurantInput.restaurantId);
-            if (!restaurant) {
-                return {
-                    ok: false,
-                    error: "Restaurant not found."
-                }
-            }
-
-            if (owner.id != restaurant.ownerId) {
-                return {
-                    ok: false,
-                    error: "You can't edit a restuarant that you don't own"
-                }
+            let isOwner = await this.checkRestaurantOwner(owner, editRestaurantInput.restaurantId);
+            if (!isOwner.ok) {
+                return isOwner;
             }
 
             let category: Category = null;
@@ -82,6 +75,93 @@ export class RestaurantService {
                 ok: false,
                 error: "Could not edit Restaurant."
             }
+        }
+    }
+
+    async deleteRestaurant(
+        owner: User,
+        deleteRestaurant: DeleteRestaurantInput
+    ): Promise<DeleteRestaurantOutput> {
+        try {
+            let isOwner = await this.checkRestaurantOwner(owner, deleteRestaurant.restaurantId);
+            if (!isOwner.ok) {
+                return isOwner;
+            }
+
+            await this.restaurants.delete(deleteRestaurant.restaurantId)
+            return {
+                ok: true
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: "Could not delete Restaurant."
+            }
+        }
+    }
+
+    async checkRestaurantOwner(owner: User, restaurantId: number) {
+        const restaurant = await this.restaurants.findOne(restaurantId);
+        if (!restaurant) {
+            return {
+                ok: false,
+                error: "Restaurant not found."
+            }
+        }
+
+        if (owner.id != restaurant.ownerId) {
+            return {
+                ok: false,
+                error: "You can't edit a restuarant that you don't own"
+            }
+        }
+
+        return { ok: true };
+    }
+
+    countRestaurants(category: Category) {
+        return this.restaurants.count({ category });
+    }
+
+    /*
+    * Category
+    */
+    async allCategories(): Promise<AllCategoriesOutput> {
+        try {
+            const categories = await this.categories.find();
+            return {
+                ok: true,
+                categories
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: 'Category not found',
+            }
+        }
+    }
+
+    async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+        try {
+            const category = await this.categories.findOne(
+                { slug },
+                { relations: ['restaurants'] },
+            );
+            if (!category) {
+                return {
+                    ok: false,
+                    error: 'Category not found',
+                };
+            }
+            return {
+                ok: true,
+                category,
+            };
+        } catch {
+            return {
+                ok: false,
+                error: 'Could not load category',
+            };
         }
     }
 }
