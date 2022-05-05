@@ -26,3 +26,13 @@ The Backend of Uber Eats Clone
  - address
  - coverImage
  - owner
+
+ - See Categories
+ - See Restaurants by Category (pagination)
+ - See Restaurants (pagination)
+ - See Restaurant
+ - Edit Restaurant
+ - Delete Restaurant
+ - Create Dish
+ - Edit Dish
+ - Delete Dish
