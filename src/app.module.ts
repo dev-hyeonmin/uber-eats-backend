@@ -6,7 +6,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { UsersModule } from './users/users.module';
-import { CommonModule } from './common/common.module';
 import { User } from './users/entities/user.entitiy';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
@@ -17,6 +16,10 @@ import { Restaurant } from './restaurants/entities/restaurants.entity';
 import { Category } from './restaurants/entities/category.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { AuthModule } from './auth/auth.module';
+import { Dish } from './restaurants/entities/dish.entity';
+import { OrderModule } from './order/order.module';
+import { Order } from './order/entities/order.entity';
+import { OrderItem } from './order/entities/order-item.entity';
 
 @Module({
   imports: [
@@ -49,7 +52,7 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== "prod",
       logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category]
+      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
     }),
     GraphQLModule.forRoot({
       driver: ApolloDriver,
@@ -82,6 +85,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     RestaurantsModule,
     AuthModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [],
