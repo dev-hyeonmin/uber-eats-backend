@@ -4,12 +4,13 @@ import { CoreEntity } from "src/common/entities/core.entity";
 import { Dish } from "src/restaurants/entities/dish.entity";
 import { Restaurant } from "src/restaurants/entities/restaurants.entity";
 import { User } from "src/users/entities/user.entitiy";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, RelationId } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 
 export enum OrderStatus {
     Pending = 'Pending',
     Cooking = 'Cooking',
+    Cooked = "Cooked",
     PickedUp = 'PickedUp',
     Delivered = 'Delivered',
 }
@@ -20,9 +21,16 @@ registerEnumType(OrderStatus, { name: 'OrderStatus' });
 @Entity()
 export class Order extends CoreEntity {
 
+    @RelationId((order: Order) => order.customer)
+    customerId: number;
+
     @Field(types => User, { nullable: true })
     @ManyToOne(type => User, user => user.orders, { onDelete: 'SET NULL', nullable: true })
     customer?: User;
+
+    @RelationId((order: Order) => order.driver)
+    driverId: number;
+
 
     @Field(types => User, { nullable: true })
     @ManyToOne(type => User, user => user.rides, { onDelete: 'SET NULL', nullable: true })

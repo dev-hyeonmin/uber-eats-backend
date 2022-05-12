@@ -55,6 +55,7 @@ import { OrderItem } from './order/entities/order-item.entity';
       entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
     }),
     GraphQLModule.forRoot({
+      inheritResolversFromInterfaces: true,
       driver: ApolloDriver,
       autoSchemaFile: true,
       context: ({ req }) => ({
