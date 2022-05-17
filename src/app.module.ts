@@ -54,13 +54,31 @@ import { OrderItem } from './order/entities/order-item.entity';
       logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
     }),
-    GraphQLModule.forRoot({
+    /*GraphQLModule.forRoot({
       inheritResolversFromInterfaces: true,
       driver: ApolloDriver,
       autoSchemaFile: true,
-      context: ({ req }) => ({
-        user: req['user']
-      })
+      context: ({ req, connection }) => {
+        const TOKEN_KEY = 'X-JWT';
+        return {
+          token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY],
+        };
+      },
+    }),*/
+    GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams: any) => ({
+            token: connectionParams['x-jwt'],
+          }),
+        },
+      },
+      autoSchemaFile: true,
+      //context: ({ req }) => ({ token: req.headers['x-jwt'] }),
+      context: ({ req }) => (
+        { token: req.headers['x-jwt'] }
+      ),
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
