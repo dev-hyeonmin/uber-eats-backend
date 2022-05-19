@@ -20,6 +20,7 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -105,6 +106,7 @@ import { OrderItem } from './order/entities/order-item.entity';
     RestaurantsModule,
     AuthModule,
     OrderModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
