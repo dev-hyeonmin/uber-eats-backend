@@ -21,6 +21,8 @@ import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 import { OrderItem } from './order/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payments.entity';
 
 @Module({
   imports: [
@@ -53,7 +55,7 @@ import { CommonModule } from './common/common.module';
       database: process.env.DB_DATABASE,
       synchronize: process.env.NODE_ENV !== "prod",
       logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
+      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment]
     }),
     /*GraphQLModule.forRoot({
       inheritResolversFromInterfaces: true,
@@ -107,6 +109,7 @@ import { CommonModule } from './common/common.module';
     AuthModule,
     OrderModule,
     CommonModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],

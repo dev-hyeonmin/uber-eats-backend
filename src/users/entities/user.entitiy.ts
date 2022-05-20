@@ -6,6 +6,7 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { IsBoolean, IsString } from "class-validator";
 import { Restaurant } from "src/restaurants/entities/restaurants.entity";
 import { Order } from "src/order/entities/order.entity";
+import { Payment } from "src/payments/entities/payments.entity";
 
 export enum UserRole {
     Client = "Client",
@@ -75,4 +76,8 @@ export class User extends CoreEntity {
             throw new InternalServerErrorException();
         }
     }
+
+    @Field(type => [Payment])
+    @OneToMany(type => Payment, payment => payment.user)
+    payments: Payment[];
 }

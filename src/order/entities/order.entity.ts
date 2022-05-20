@@ -31,7 +31,6 @@ export class Order extends CoreEntity {
     @RelationId((order: Order) => order.driver)
     driverId: number;
 
-
     @Field(types => User, { nullable: true })
     @ManyToOne(type => User, user => user.rides, { onDelete: 'SET NULL', nullable: true, eager: true })
     driver?: User;
