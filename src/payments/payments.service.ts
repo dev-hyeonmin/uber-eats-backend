@@ -1,16 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Interval } from '@nestjs/schedule';
 import { Restaurant } from "src/restaurants/entities/restaurants.entity";
 import { User } from "src/users/entities/user.entitiy";
-import { Repository } from "typeorm";
-import { CreatePaymentInput, CreatePaymentOutput } from "./dtos/create-payment";
+import { LessThan, Repository } from "typeorm";
+import { CreatePaymentInput, CreatePaymentOutput } from "./dtos/create-payment.dto";
+import { GetPaymentsOutput } from "./dtos/get-payment.dto";
 import { Payment } from "./entities/payments.entity";
 
 @Injectable()
 export class PaymentService {
     constructor(
         @InjectRepository(Payment)
-        private readonly payment: Repository<Payment>,
+        private readonly payments: Repository<Payment>,
         @InjectRepository(Restaurant)
         private readonly restaurant: Repository<Restaurant>,
     ) { }
@@ -31,8 +33,15 @@ export class PaymentService {
                     error: 'You are not allowed to do this.',
                 }
             }
-            await this.payment.save(
-                this.payment.create({
+
+            const date = new Date();
+            date.setDate(date.getDate() + 7);
+            restaurant.isPromoted = true;
+            restaurant.promotedUntil = date;
+            await this.restaurant.save(restaurant);
+
+            await this.payments.save(
+                this.payments.create({
                     transactionId,
                     restaurant,
                     user: owner
@@ -47,5 +56,34 @@ export class PaymentService {
                 error: 'Could not create payment.'
             }
         }
+    }
+
+    async getPayments(user: User): Promise<GetPaymentsOutput> {
+        try {
+            const payments = await this.payments.find({ user: user });
+            return {
+                ok: true,
+                payments,
+            };
+        } catch {
+            return {
+                ok: false,
+                error: 'Could not load payments.',
+            };
+        }
+    }
+
+    @Interval(2000)
+    async checkPromotedRestaurants() {
+        const restaurants = await this.restaurant.find({
+            isPromoted: true,
+            promotedUntil: LessThan(new Date())
+        });
+
+        restaurants.forEach(async restaurant => {
+            restaurant.isPromoted = false;
+            restaurant.promotedUntil = null;
+            this.restaurant.save(restaurant);
+        });
     }
 }

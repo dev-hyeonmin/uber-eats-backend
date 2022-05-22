@@ -27,6 +27,14 @@ export class Restaurant extends CoreEntity {
     @IsString()
     address: string;
 
+    @Field(type => Boolean)
+    @Column({default: false})
+    isPromoted: boolean;
+
+    @Field(type => Date, { nullable: true })
+    @Column({ nullable: true })
+    promotedUntil: Date;
+
     @Field(type => Category, { nullable: true })
     @ManyToOne(
         () => Category,
