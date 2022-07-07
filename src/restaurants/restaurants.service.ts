@@ -10,6 +10,8 @@ import { DeleteDishInput, DeleteDishOutput } from "./dtos/delete-dish.dto";
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
 import { EditDishInput, EditDishOutput } from "./dtos/edit-dish.dto";
 import { EditRestaurantInput, EditRestaurantOuput } from "./dtos/edit-restaurant.dto";
+import { MyRestaurantInput, MyRestaurantOutput } from "./dtos/my-restaurant.dto";
+import { MyRestaurantsOutput } from "./dtos/my-restaurants.dto";
 import { RestaurantInput, RestaurantOutput } from "./dtos/restaurant.dto";
 import { RestaurantsInput, RestaurantsOutput } from "./dtos/restaurants.dto";
 import { SearchRestaurantInput, SearchRestaurantOutput } from "./dtos/search-restaurant.dto";
@@ -99,6 +101,39 @@ export class RestaurantService {
             }
         }
     }
+
+    async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+        try {
+            const restaurants = await this.restaurants.find({owner});
+
+            return {
+                ok: true,
+                restaurants,
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                error: 'Could not find restaurants.'
+            }
+        }
+    }
+
+    async myRestaurant(owner: User, {id}: MyRestaurantInput): Promise<MyRestaurantOutput> {
+        try {
+            const restaurant = await this.restaurants.findOne({owner, id}, {relations: ['menu', 'order']});
+
+            return {
+                ok: true,
+                restaurant,
+            };
+        } catch (error) {
+            return {
+                ok: false,
+                error: 'Could not find restaurant.'
+            }
+        }
+    }
+
 
     async createRestaurant(
         owner: User,

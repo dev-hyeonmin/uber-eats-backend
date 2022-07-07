@@ -37,9 +37,9 @@ export class Restaurant extends CoreEntity {
 
     @Field(type => Category, { nullable: true })
     @ManyToOne(
-        () => Category,
-        (category) => category.restaurants,
-        { nullable: true, onDelete: 'SET NULL' }
+      type => Category,
+      category => category.restaurants,
+      { nullable: true, onDelete: 'SET NULL', eager: true },
     )
     category: Category;
 
