@@ -24,6 +24,7 @@ import { OrderItem } from './order/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payments.entity';
+import { UploadsModule } from './uploads/uploads.module';
 
 
 @Module({
@@ -45,6 +46,8 @@ import { Payment } from './payments/entities/payments.entity';
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN_NAME: Joi.string().required(),
         MAILGUN_FROM_EMAIL: Joi.string().required(),
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         //MAILGUN_FROM_PASSWORD: Joi.string().required(),
       }),
     }),
@@ -113,6 +116,7 @@ import { Payment } from './payments/entities/payments.entity';
     OrderModule,
     CommonModule,
     PaymentsModule,
+    UploadsModule,
   ],
   controllers: [],
   providers: [],
