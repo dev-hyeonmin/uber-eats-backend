@@ -120,8 +120,8 @@ export class RestaurantService {
 
     async myRestaurant(owner: User, {id}: MyRestaurantInput): Promise<MyRestaurantOutput> {
         try {
-            const restaurant = await this.restaurants.findOne({owner, id}, {relations: ['menu', 'order']});
-
+            const restaurant = await this.restaurants.findOne({owner, id}, {relations: ['menu', 'orders']});
+            
             return {
                 ok: true,
                 restaurant,
@@ -152,6 +152,7 @@ export class RestaurantService {
             await this.restaurants.save(newRestaurant);
             return {
                 ok: true,
+                restaurantId: newRestaurant.id
             };
         } catch (error) {
             return {

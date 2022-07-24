@@ -62,7 +62,7 @@ export class OrderService {
                         if (dishOption.extra) {
                             dishFinalPrice = dishFinalPrice + dishOption.extra;
                         } else {
-                            const dishOptionChoice = dishOption.choices.find(
+                            const dishOptionChoice = dishOption.choices?.find(
                                 optionChoice => optionChoice.name === itemOption.choice,
                             );
                             if (dishOptionChoice) {
@@ -99,6 +99,7 @@ export class OrderService {
 
             return {
                 ok: true,
+                orderId: order.id
             }
         } catch (error) {
             return {
@@ -231,9 +232,9 @@ export class OrderService {
                     await this.pubSub.publish(NEW_COOKED_ORDER, { coockedOrders: newOrder });
                 }
             }
-
+            
             await this.pubSub.publish(NEW_ORDER_UPDATE, { orderUpdates: newOrder });
-
+            
             return {
                 ok: true,
             };

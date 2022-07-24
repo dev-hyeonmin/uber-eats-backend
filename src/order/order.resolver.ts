@@ -108,6 +108,7 @@ export class OrderResolver {
             ) {
                 return false;
             }
+            return order.id === input.id;
         }
     })
     @Role(['Any'])
